@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// criar uma migration yarn prisma migrate dev
+
+model Usuarios {
+  id         String    @id @default(uuid())
+  nome       String
+  email      String
+  senha      String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+
+  @@map("usuario")
+}
+
+model Personagens {
+
+  id              String    @id @default(uuid())
+  nome            String
+  apelido         String?
+  url_imagem      String
+  afiliacao       String
+  recompensa      String?
+  descricao       String
+  aniversario     String?
+  created_at      DateTime? @default(now())
+  updated_at      DateTime? @default(now())
+
+  tripulacao    Tripulacao? @relation(fields: [tripulacao_id], references: [id])
+  tripulacao_id String?
+
+  akumanomi    AkumaNoMi? @relation(fields: [akumanomi_id], references: [id])
+  akumanomi_id String?
+
+  tripulacaoPersonagem TripulacaoPersonagem[]
+  akumanomiPersonagem AkumaNoMiPersonagem[]
+
+  @@map("personagem")
+}
+
+model Tripulacao {
+
+  id         String    @id @default(uuid())
+  nome       String
+  url_imagem String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+
+  personagem           Personagens[]
+  tripulacaoPersonagem TripulacaoPersonagem[]
+
+  @@map("tripulacao")
+}
+
+model TripulacaoPersonagem {
+
+  id         String    @id @default(uuid())
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+
+  personagem Personagens @relation(fields: [personagem_id], references: [id])
+  personagem_id String
+
+  tripulacao Tripulacao  @relation(fields: [tripulacao_id], references: [id])
+  tripulacao_id String
+
+
+  @@map("tripulacao_personagem")
+}
+
+model AkumaNoMi {
+  
+  id            String    @id @default(uuid())
+  nome          String
+  url_imagem    String
+  tipo          String
+  descricao     String
+  created_at    DateTime? @default(now())
+  updated_at    DateTime? @default(now())
+
+  personagem Personagens[]
+  akumanomiPersonagem AkumaNoMiPersonagem[]
+
+  @@map("akumanomi")
+}
+
+model AkumaNoMiPersonagem {
+
+  id String    @id @default(uuid())
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+
+  personagem Personagens @relation(fields: [personagem_id], references: [id])
+  personagem_id String
+
+  akumanomi AkumaNoMi @relation(fields: [akumanomi_id], references: [id])
+  akumanomi_id String
+
+  @@map("akumanomi_personagem")
+
+}
